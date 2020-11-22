@@ -1,13 +1,21 @@
 ---
-- name: Stop if either kube-master, kube-node or etcd is empty
+- name: Stop if either kube-master or kube-node group is empty
   assert:
-    that: groups.get('{{ item }}')
+    that: "groups.get('{{ item }}')"
   with_items:
     - kube-master
     - kube-node
-    - etcd
   run_once: true
   when: not ignore_assert_errors
+
+- name: Stop if etcd group is empty in external etcd mode
+  assert:
+    that: groups.get('etcd')
+    fail_msg: "Group 'etcd' cannot be empty in external etcd mode"
+  run_once: true
+  when:
+    - not ignore_assert_errors
+    - not etcd_kubeadm_enabled
 
 - name: Stop if non systemd OS type
   assert:
@@ -61,6 +69,7 @@
     that: groups.etcd|length is not divisibleby 2
   when:
     - not ignore_assert_errors
+    - groups.get('etcd')
     - inventory_hostname in groups['etcd']
 
 - name: Stop if memory is too small for masters
@@ -95,6 +104,7 @@
 - name: Stop if ip var does not match local ips
   assert:
     that: ip in ansible_all_ipv4_addresses
+    msg: "'{{ ansible_all_ipv4_addresses }}' do not contain '{{ ip }}'"
   when:
     - not ignore_assert_errors
     - ip is defined
@@ -152,13 +162,13 @@
 
 - name: Ensure minimum calico version
   assert:
-    that: calico_version is version('v3.0.0', '>=')
-    msg: "calico_version is too low. Minimum version v3.0.0"
+    that: calico_version is version(calico_min_version_required, '>=')
+    msg: "calico_version is too low. Minimum version {{ calico_min_version_required }}"
   run_once: yes
   when:
     - kube_network_plugin == 'calico'
 
-- name: "Get current version of calico cluster version"
+- name: Get current calico cluster version
   shell: "set -o pipefail && {{ bin_dir }}/calicoctl.sh version  | grep 'Cluster Version:' | awk '{ print $3}'"
   args:
     executable: /bin/bash
@@ -171,11 +181,11 @@
   when:
     - kube_network_plugin == 'calico'
 
-- name: "Check that calico version is enough for upgrade"
+- name: Check that current calico version is enough for upgrade
   assert:
     that:
-      - calico_version_on_server.stdout is version('v2.6.5', '>=')
-    msg: "Your version of calico is not fresh enough for upgrade. Minimum version v2.6.5"
+      - calico_version_on_server.stdout is version(calico_min_version_required, '>=')
+    msg: "Your version of calico is not fresh enough for upgrade. Minimum version {{ calico_min_version_required }}"
   when:
     - kube_network_plugin == 'calico'
     - 'calico_version_on_server.stdout is defined'
@@ -258,12 +268,6 @@
   when: resolvconf_mode is defined
   run_once: true
 
-- name: Stop if kubeadm etcd mode is enabled but experimental control plane is not
-  assert:
-    that: kubeadm_control_plane
-    msg: "kubeadm etcd mode requires experimental control plane"
-  when: etcd_kubeadm_enabled
-
 - name: Stop if etcd deployment type is not host or docker
   assert:
     that: etcd_deployment_type in ['host', 'docker']
@@ -281,6 +285,12 @@
     that: container_manager == 'docker'
     msg: "download_run_once support only for docker. See https://github.com/containerd/containerd/issues/4075 for details"
   when: download_run_once or download_force_cache
+
+- name: Stop if kata_containers_enabled is enabled when container_manager is docker
+  assert:
+    that: container_manager != 'docker'
+    msg: "kata_containers_enabled support only for containerd and crio-o. See https://github.com/kata-containers/documentation/blob/1.11.4/how-to/run-kata-with-k8s.md#install-a-cri-implementation for details"
+  when: kata_containers_enabled
 
 - name: Stop if download_localhost is enabled for Flatcar Container Linux
   assert:

@@ -156,6 +156,12 @@ variable "dns_nameservers" {
   default     = []
 }
 
+variable "k8s_master_fips" {
+  description = "specific pre-existing floating IPs to use for master nodes"
+  type        = list(string)
+  default     = []
+}
+
 variable "floatingip_pool" {
   description = "name of the floating ip pool to use"
   default     = "external"
@@ -236,7 +242,19 @@ variable "router_id" {
   default     = null
 }
 
+variable "router_internal_port_id" {
+  description = "uuid of the port connection our router to our network"
+  default     = null
+}
+
 variable "k8s_nodes" {
   default = {}
 }
 
+variable "extra_sec_groups" {
+  default = false
+}
+
+variable "extra_sec_groups_name" {
+  default = "custom"
+}

@@ -1,4 +1,11 @@
 ---
+- name: prep_kubeadm_images | Check kubeadm version matches kubernetes version
+  fail:
+    msg: "Kubeadm version {{ kubeadm_version }} do not matches kubernetes {{ kube_version }}"
+  when:
+    - not skip_downloads | default(false)
+    - not kubeadm_version == downloads.kubeadm.version
+
 - name: prep_kubeadm_images | Download kubeadm binary
   include_tasks: "download_file.yml"
   vars:
@@ -31,7 +38,7 @@
     state: file
 
 - name: prep_kubeadm_images | Generate list of required images
-  shell: "set -o pipefail && {{ bin_dir }}/kubeadm config images list --config={{ kube_config_dir }}/kubeadm-images.yaml | grep -v coredns"
+  shell: "set -o pipefail && {{ bin_dir }}/kubeadm config images list --config={{ kube_config_dir }}/kubeadm-images.yaml | grep -Ev 'coredns|pause'"
   args:
     executable: /bin/bash
   register: kubeadm_images_raw

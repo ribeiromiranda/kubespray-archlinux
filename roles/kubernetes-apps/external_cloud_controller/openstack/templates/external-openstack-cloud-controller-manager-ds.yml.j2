@@ -44,6 +44,9 @@ spec:
             - --cloud-provider=openstack
             - --use-service-account-credentials=true
             - --address=127.0.0.1
+{% for key, value in external_openstack_cloud_controller_extra_args.items() %}
+            - "{{ '--' + key + '=' + value }}"
+{% endfor %}
           volumeMounts:
             - mountPath: /etc/kubernetes/pki
               name: k8s-certs
@@ -59,8 +62,10 @@ spec:
               name: openstack-cacert
               readOnly: true
 {% endif %}
+{% if kubelet_flexvolumes_plugins_dir is defined %}
             - mountPath: /usr/libexec/kubernetes/kubelet-plugins/volume/exec
               name: flexvolume-dir
+{% endif %}
           resources:
             requests:
               cpu: 200m
@@ -69,10 +74,12 @@ spec:
               value: /etc/config/cloud.conf
       hostNetwork: true
       volumes:
+{% if kubelet_flexvolumes_plugins_dir is defined %}
       - hostPath:
           path: "{{ kubelet_flexvolumes_plugins_dir }}"
           type: DirectoryOrCreate
         name: flexvolume-dir
+{% endif %}
       - hostPath:
           path: /etc/kubernetes/pki
           type: DirectoryOrCreate

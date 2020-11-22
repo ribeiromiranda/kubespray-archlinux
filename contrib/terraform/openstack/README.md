@@ -239,6 +239,7 @@ For your cluster, edit `inventory/$CLUSTER/cluster.tfvars`.
 |`network_dns_domain` | (Optional) The dns_domain for the internal network that will be generated |
 |`dns_nameservers`| An array of DNS name server names to be used by hosts in the internal subnet. |
 |`floatingip_pool` | Name of the pool from which floating IPs will be allocated |
+|`k8s_master_fips` | A list of floating IPs that you have already pre-allocated; they will be attached to master nodes instead of creating new random floating IPs. |
 |`external_net` | UUID of the external network that will be routed to |
 |`flavor_k8s_master`,`flavor_k8s_node`,`flavor_etcd`, `flavor_bastion`,`flavor_gfs_node` | Flavor depends on your openstack installation, you can get available flavor IDs through `openstack flavor list` |
 |`image`,`image_gfs` | Name of the image to use in provisioning the compute resources. Should already be loaded into glance. |
@@ -264,6 +265,7 @@ For your cluster, edit `inventory/$CLUSTER/cluster.tfvars`.
 |`etcd_root_volume_size_in_gb` | Size of the root volume for etcd nodes, 0 to use ephemeral storage |
 |`bastion_root_volume_size_in_gb` | Size of the root volume for bastions, 0 to use ephemeral storage |
 |`use_server_group` | Create and use openstack nova servergroups, default: false |
+|`use_access_ip` | If 1, nodes with floating IPs will transmit internal cluster traffic via floating IPs; if 0 private IPs will be used instead. Default value is 1. |
 |`k8s_nodes` | Map containing worker node definition, see explanation below |
 
 ##### k8s_nodes
@@ -537,10 +539,6 @@ resolvconf_mode: host_resolvconf
 - Set max amount of attached cinder volume per host (default 256)
 ```
 node_volume_attach_limit: 26
-```
-- Disable access_ip, this will make all innternal cluster traffic to be sent over local network when a floating IP is attached (default this value is set to 1)
-```
-use_access_ip: 0
 ```
 
 ### Deploy Kubernetes

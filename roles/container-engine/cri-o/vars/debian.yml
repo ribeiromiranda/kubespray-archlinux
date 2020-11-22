@@ -1,7 +1,12 @@
 ---
 
 crio_packages:
-  - "cri-o-{{ crio_version }}"
-  - runc
+  - "cri-o"
+  - "cri-o-runc"
 
-crio_runc_path: /usr/sbin/runc
+# The crio_runtimes variable defines a list of OCI compatible runtimes.
+crio_runtimes:
+  - name: runc
+    path: /usr/sbin/runc
+    type: oci
+    root: /run/runc

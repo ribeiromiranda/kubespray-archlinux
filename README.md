@@ -116,20 +116,20 @@ Note: Upstart/SysV init based OS types are not supported.
 ## Supported Components
 
 - Core
-  - [kubernetes](https://github.com/kubernetes/kubernetes) v1.18.8
+  - [kubernetes](https://github.com/kubernetes/kubernetes) v1.19.3
   - [etcd](https://github.com/coreos/etcd) v3.4.3
   - [docker](https://www.docker.com/) v19.03 (see note)
-  - [containerd](https://containerd.io/) v1.2.13
-  - [cri-o](http://cri-o.io/) v1.17 (experimental: see [CRI-O Note](docs/cri-o.md). Only on fedora, ubuntu and centos based OS)
+  - [containerd](https://containerd.io/) v1.3.7
+  - [cri-o](http://cri-o.io/) v1.19 (experimental: see [CRI-O Note](docs/cri-o.md). Only on fedora, ubuntu and centos based OS)
 - Network Plugin
-  - [cni-plugins](https://github.com/containernetworking/plugins) v0.8.6
-  - [calico](https://github.com/projectcalico/calico) v3.15.2
+  - [cni-plugins](https://github.com/containernetworking/plugins) v0.8.7
+  - [calico](https://github.com/projectcalico/calico) v3.16.4
   - [canal](https://github.com/projectcalico/canal) (given calico/flannel versions)
-  - [cilium](https://github.com/cilium/cilium) v1.8.3
+  - [cilium](https://github.com/cilium/cilium) v1.8.5
   - [contiv](https://github.com/contiv/install) v1.2.1
-  - [flanneld](https://github.com/coreos/flannel) v0.12.0
+  - [flanneld](https://github.com/coreos/flannel) v0.13.0
   - [kube-ovn](https://github.com/alauda/kube-ovn) v1.3.0
-  - [kube-router](https://github.com/cloudnativelabs/kube-router) v1.0.1
+  - [kube-router](https://github.com/cloudnativelabs/kube-router) v1.1.0
   - [multus](https://github.com/intel/multus-cni) v3.6.0
   - [ovn4nfv](https://github.com/opnfv/ovn4nfv-k8s-plugin) v1.1.0
   - [weave](https://github.com/weaveworks/weave) v2.7.0
@@ -138,8 +138,8 @@ Note: Upstart/SysV init based OS types are not supported.
   - [cephfs-provisioner](https://github.com/kubernetes-incubator/external-storage) v2.1.0-k8s1.11
   - [rbd-provisioner](https://github.com/kubernetes-incubator/external-storage) v2.1.1-k8s1.11
   - [cert-manager](https://github.com/jetstack/cert-manager) v0.16.1
-  - [coredns](https://github.com/coredns/coredns) v1.6.7
-  - [ingress-nginx](https://github.com/kubernetes/ingress-nginx) v0.35.0
+  - [coredns](https://github.com/coredns/coredns) v1.7.0
+  - [ingress-nginx](https://github.com/kubernetes/ingress-nginx) v0.40.2
 
 Note: The list of validated [docker versions](https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker) is 1.13.1, 17.03, 17.06, 17.09, 18.06, 18.09 and 19.03. The recommended docker version is 19.03. The kubelet might break on docker's non-standard version numbering (it no longer uses semantic versioning). To ensure auto-updates don't break your cluster look into e.g. yum versionlock plugin or apt pin).
 
