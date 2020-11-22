@@ -15,6 +15,8 @@
       /etc/pki/ca-trust/source/anchors/vault-ca.crt
       {%- elif ansible_os_family in ["Coreos", "Container Linux by CoreOS", "Flatcar", "Flatcar Container Linux by Kinvolk"] -%}
       /etc/ssl/certs/vault-ca.pem
+      {%- elif ansible_os_family == "Archlinux" -%}
+      /etc/ca-certificates/trust-source/anchors/vault-ca.crt
       {%- endif %}
 
 - name: bootstrap/ca_trust | add CA to trusted CA dir
@@ -27,6 +29,6 @@
   command: update-ca-certificates
   when: vault_ca_cert.changed and ansible_os_family in ["Debian", "CoreOS", "Coreos", "Container Linux by CoreOS", "Flatcar", "Flatcar Container Linux by Kinvolk"]
 
-- name: bootstrap/ca_trust | update ca-certificates (RedHat)
+- name: bootstrap/ca_trust | update ca-certificates (Archlinux/RedHat)
   command: update-ca-trust extract
-  when: vault_ca_cert.changed and ansible_os_family == "RedHat"
+  when: vault_ca_cert.changed and ansible_os_family in ["Archlinux", "RedHat"]

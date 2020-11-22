@@ -1,0 +1,15 @@
+---
+# Instance settings
+mode: ha
+vagrant_box: centos/7
+vagrant_box_url:
+vagrant_user: vagrant
+
+
+# Deployment settings
+kube_network_plugin: calico
+download_localhost: true
+download_run_once: true
+deploy_netchecker: true
+dns_min_replicas: 1
+

@@ -1,0 +1,28 @@
+---
+#  raw: cat /etc/issue.net | grep '{{ bootstrap_versions }}'
+
+- name: Bootstrap | Check if bootstrap is needed
+  raw: which "{{ item }}"
+  register: need_bootstrap
+  failed_when: false
+  changed_when: false
+  with_items:
+    - ethtool
+    - python-netaddr
+    - sshpass
+  environment: {}
+  tags:
+    - facts
+
+- name: Bootstrap | Install packages
+  raw:
+    rm -f /var/lib/pacman/db.lck && \
+    pacman -Sy && \
+    pacman -S --noconfirm --noprogressbar ethtool python-netaddr sshpass
+  when:
+    need_bootstrap.results | map(attribute='rc') | sort | last | bool
+
+- name: Create directory /etc/bash_completion.d
+  file:
+    path: /etc/bash_completion.d
+    state: directory

@@ -60,3 +60,14 @@
     value: 1
     state: present
     reload: yes
+
+- name: Enable net.ipv4.conf.all.rp_filter
+  sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv4.conf.all.rp_filter
+    value: 1
+    state: present
+    reload: yes
+  when:
+    - ansible_os_family in ["Archlinux"]
+    - kube_network_plugin == "calico"

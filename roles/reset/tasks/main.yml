@@ -296,7 +296,7 @@
       {%- else -%}
       network
       {%- endif -%}
-      {%- elif ansible_distribution == "Ubuntu" and ansible_distribution_release == "bionic" -%}
+      {%- elif ansible_os_family == "Archlinux" or ansible_distribution == "Ubuntu" and ansible_distribution_release == "bionic" -%}
       systemd-networkd
       {%- elif ansible_os_family == "Debian" -%}
       networking

@@ -35,6 +35,7 @@ SUPPORTED_OS = {
   "opensuse"            => {box: "bento/opensuse-leap-15.1",   user: "vagrant"},
   "opensuse-tumbleweed" => {box: "opensuse/Tumbleweed.x86_64", user: "vagrant"},
   "oraclelinux"         => {box: "generic/oracle7",            user: "vagrant"},
+  "archlinux"           => {box: "archlinux/archlinux",        user: "vagrant"}
 }
 
 if File.exist?(CONFIG)

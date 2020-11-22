@@ -1,0 +1,15 @@
+---
+# Instance settings
+mode: ha
+vagrant_box: archlinux/archlinux
+vagrant_box_url:
+vagrant_user: vagrant
+
+# Deployment settings
+kube_network_plugin: flannel
+flannel_interface: eth1
+kubeadm_enabled: true
+skip_non_kubeadm_warning: true
+deploy_netchecker: true
+dns_min_replicas: 1
+loadbalancer_apiserver_type: haproxy

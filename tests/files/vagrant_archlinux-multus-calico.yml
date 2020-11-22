@@ -1,0 +1,12 @@
+---
+# Instance settings
+mode: default
+vagrant_box: archlinux/archlinux
+vagrant_box_url:
+vagrant_user: vagrant
+
+# Deployment settings
+kube_network_plugin_multus: true
+kube_network_plugin: calico
+deploy_netchecker: true
+dns_min_replicas: 1
