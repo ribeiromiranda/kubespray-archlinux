@@ -22,9 +22,6 @@ kubelet_kubelet_cgroups: "/systemd/system.slice"
 ### fail with swap on (default true)
 kubelet_fail_swap_on: true
 
-# Optionally remove kube_proxy installed by kubeadm
-kube_proxy_remove: false
-
 # Reserve this space for kube resources
 kube_memory_reserved: 256M
 kube_cpu_reserved: 100m
@@ -53,8 +50,6 @@ loadbalancer_apiserver_keepalive_timeout: 5m
 # A port range to reserve for services with NodePort visibility.
 # Inclusive at both ends of the range.
 kube_apiserver_node_port_range: "30000-32767"
-
-kubelet_load_modules: false
 
 # Configure the amount of pods able to run on single node
 # default is equal to application default
@@ -143,3 +138,33 @@ azure_exclude_master_from_standard_lb: true
 azure_disable_outbound_snat: false
 # use instance metadata service where possible
 azure_use_instance_metadata: true
+# use specific Azure API endpoints
+azure_cloud: AzurePublicCloud
+
+## Support tls min version, Possible values: VersionTLS10, VersionTLS11, VersionTLS12, VersionTLS13.
+# tls_min_version: ""
+
+## Support tls cipher suites.
+# tls_cipher_suites:
+#   - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+#   - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
+#   - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+#   - TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA
+#   - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+#   - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+#   - TLS_ECDHE_ECDSA_WITH_RC4_128_SHA
+#   - TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA
+#   - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+#   - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256
+#   - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+#   - TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+#   - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+#   - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+#   - TLS_ECDHE_RSA_WITH_RC4_128_SHA
+#   - TLS_RSA_WITH_3DES_EDE_CBC_SHA
+#   - TLS_RSA_WITH_AES_128_CBC_SHA
+#   - TLS_RSA_WITH_AES_128_CBC_SHA256
+#   - TLS_RSA_WITH_AES_128_GCM_SHA256
+#   - TLS_RSA_WITH_AES_256_CBC_SHA
+#   - TLS_RSA_WITH_AES_256_GCM_SHA384
+#   - TLS_RSA_WITH_RC4_128_SHA

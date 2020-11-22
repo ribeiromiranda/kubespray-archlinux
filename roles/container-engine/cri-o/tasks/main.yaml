@@ -47,6 +47,10 @@
   when: not is_ostree
   with_items: "{{ crio_packages }}"
   notify: restart crio
+  register: package_install
+  until: package_install is succeeded
+  retries: 4
+  delay: "{{ retry_stagger | d(3) }}"
 
 - name: Gather the rpm package facts
   package_facts:
@@ -55,7 +59,7 @@
     - ansible_distribution == "CentOS"
     - ansible_distribution_major_version == "8"
 
-- name: Ensure latest version of libseccom installed
+- name: Ensure latest version of libseccom installed  # noqa 303
   command: "yum update -y libseccomp"
   when:
     - ansible_distribution == "CentOS"

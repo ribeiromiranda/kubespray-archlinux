@@ -23,9 +23,6 @@ spec:
       hostPID: true
       tolerations:
         - operator: Exists
-        # Mark pod as critical for rescheduling (Will have no effect starting with kubernetes 1.12)
-        - key: CriticalAddonsOnly
-          operator: "Exists"
       containers:
       # Runs ovs containers on each Kubernetes node.
       - name: contiv-ovsdb-server
@@ -60,15 +57,15 @@ spec:
                 name: contiv-config
                 key: contiv_ovs_vswitchd_extra_flags
         volumeMounts:
-         - mountPath: /etc/openvswitch
-           name: etc-openvswitch
-           readOnly: false
-         - mountPath: /lib/modules
-           name: lib-modules
-           readOnly: true
-         - mountPath: /var/run
-           name: var-run
-           readOnly: false
+          - mountPath: /etc/openvswitch
+            name: etc-openvswitch
+            readOnly: false
+          - mountPath: /lib/modules
+            name: lib-modules
+            readOnly: true
+          - mountPath: /var/run
+            name: var-run
+            readOnly: false
       volumes:
         # Used by contiv-ovs
         - name: etc-openvswitch

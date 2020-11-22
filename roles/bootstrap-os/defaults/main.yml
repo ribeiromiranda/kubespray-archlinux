@@ -3,7 +3,7 @@
 # Use the fastestmirror yum plugin
 centos_fastestmirror_enabled: false
 
-## CoreOS specific variables
+## Flatcar Container Linux specific variables
 # Disable locksmithd or leave it in its current state
 coreos_locksmithd_disable: false
 
@@ -13,8 +13,7 @@ use_oracle_public_repo: true
 
 fedora_coreos_packages:
   - python
-  - libselinux-python3
-  - dbus-tools              # because of networkManager reload bug (https://bugzilla.redhat.com/show_bug.cgi?id=1745659)
+  - python3-libselinux
   - ethtool                 # required in kubeadm preflight phase for verifying the environment
   - ipset                   # required in kubeadm preflight phase for verifying the environment
   - conntrack-tools         # required by kube-proxy

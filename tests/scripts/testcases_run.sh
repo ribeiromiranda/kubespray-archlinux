@@ -23,7 +23,7 @@ export ANSIBLE_BECOME_USER=root
 cd tests && make create-${CI_PLATFORM} -s ; cd ..
 ansible-playbook tests/cloud_playbooks/wait-for-ssh.yml
 
-# CoreOS needs auto update disabled
+# Flatcar Container Linux needs auto update disabled
 if [[ "$CI_JOB_NAME" =~ "coreos" ]]; then
   ansible all -m raw -a 'systemctl disable locksmithd'
   ansible all -m raw -a 'systemctl stop locksmithd'
@@ -49,7 +49,7 @@ fi
 # Check out latest tag if testing upgrade
 test "${UPGRADE_TEST}" != "false" && git fetch --all && git checkout "$KUBESPRAY_VERSION"
 # Checkout the CI vars file so it is available
-test "${UPGRADE_TEST}" != "false" && git checkout "${CI_BUILD_REF}" tests/files/${CI_JOB_NAME}.yml tests/testcases/*.yml
+test "${UPGRADE_TEST}" != "false" && git checkout "${CI_BUILD_REF}" tests/files/${CI_JOB_NAME}.yml
 
 # Install mitogen ansible plugin
 if [ "${MITOGEN_ENABLE}" = "true" ]; then
@@ -79,11 +79,11 @@ fi
 ## Test Master API
 ansible-playbook --limit "all:!fake_hosts" -e @${CI_TEST_VARS} tests/testcases/010_check-apiserver.yml $ANSIBLE_LOG_LEVEL
 
-## Test that all pods are Running
-ansible-playbook --limit "all:!fake_hosts" -e @${CI_TEST_VARS} tests/testcases/015_check-pods-running.yml $ANSIBLE_LOG_LEVEL
-
 ## Test that all nodes are Ready
-ansible-playbook --limit "all:!fake_hosts" -e @${CI_TEST_VARS} tests/testcases/020_check-nodes-ready.yml $ANSIBLE_LOG_LEVEL
+ansible-playbook --limit "all:!fake_hosts" -e @${CI_TEST_VARS} tests/testcases/015_check-nodes-ready.yml $ANSIBLE_LOG_LEVEL
+
+## Test that all pods are Running
+ansible-playbook --limit "all:!fake_hosts" -e @${CI_TEST_VARS} tests/testcases/020_check-pods-running.yml $ANSIBLE_LOG_LEVEL
 
 ## Test pod creation and ping between them
 ansible-playbook --limit "all:!fake_hosts" -e @${CI_TEST_VARS} tests/testcases/030_check-network.yml $ANSIBLE_LOG_LEVEL

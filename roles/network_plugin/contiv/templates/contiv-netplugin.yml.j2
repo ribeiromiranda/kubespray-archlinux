@@ -26,9 +26,6 @@ spec:
       hostPID: true
       tolerations:
         - operator: Exists
-        # Mark pod as critical for rescheduling (Will have no effect starting with kubernetes 1.12)
-        - key: CriticalAddonsOnly
-          operator: "Exists"
       serviceAccountName: contiv-netplugin
       initContainers:
         - name: contiv-netplugin-init
@@ -81,8 +78,8 @@ spec:
               value: kubernetes
             - name: CONTIV_NETPLUGIN_VTEP_IP
               valueFrom:
-                 fieldRef:
-                    fieldPath: status.podIP
+                fieldRef:
+                  fieldPath: status.podIP
             - name: CONTIV_NETPLUGIN_ETCD_ENDPOINTS
               valueFrom:
                 configMapKeyRef:

@@ -1,5 +1,6 @@
 ---
-docker_version: '18.09'
+docker_version: '19.03'
+docker_cli_version: "{{ 'latest' if docker_version != 'latest' and docker_version is version('18.09', '<') else docker_version }}"
 docker_selinux_version: '17.03'
 
 docker_package_info:
@@ -17,6 +18,8 @@ dockerproject_repo_key_info:
 dockerproject_repo_info:
   repos:
 
+docker_cgroup_driver: systemd
+
 docker_dns_servers_strict: true
 
 docker_container_storage_setup: false
@@ -27,7 +30,9 @@ yum_repo_dir: /etc/yum.repos.d
 docker_yum_conf: /etc/yum_docker.conf
 
 # Fedora docker-ce repo
-docker_fedora_repo_base_url: 'https://download.docker.com/linux/fedora/$releasever/$basearch/stable'
+# TODO Remove the line below as soon as docker rpm are available for f32
+docker_fedora_release: "{{ '31' if (ansible_distribution_major_version | int) > 31 else ansible_distribution_major_version }}"
+docker_fedora_repo_base_url: 'https://download.docker.com/linux/fedora/{{ docker_fedora_release }}/$basearch/stable'
 docker_fedora_repo_gpgkey: 'https://download.docker.com/linux/fedora/gpg'
 # CentOS/RedHat docker-ce repo
 docker_rh_repo_base_url: 'https://download.docker.com/linux/centos/7/$basearch/stable'
@@ -40,8 +45,8 @@ docker_debian_repo_base_url: "https://download.docker.com/linux/debian"
 docker_debian_repo_gpgkey: 'https://download.docker.com/linux/debian/gpg'
 docker_bin_dir: "/usr/bin"
 # CentOS/RedHat Extras repo
-extras_rh_repo_base_url: "http://mirror.centos.org/centos/$releasever/extras/$basearch/"
-extras_rh_repo_gpgkey: "http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7"
+extras_rh_repo_base_url: "http://mirror.centos.org/centos/{{ ansible_distribution_major_version }}/extras/$basearch/"
+extras_rh_repo_gpgkey: "http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-{{ ansible_distribution_major_version }}"
 
 # flag to enable/disable docker cleanup
 docker_orphan_clean_up: false

@@ -31,8 +31,14 @@ healthzPort: {{ kubelet_healthz_port }}
 healthzBindAddress: {{ kubelet_healthz_bind_address }}
 kubeletCgroups: {{ kubelet_kubelet_cgroups }}
 clusterDomain: {{ dns_domain }}
+{% if kubelet_protect_kernel_defaults|bool %}
+protectKernelDefaults: true
+{% endif %}
 {% if kubelet_rotate_certificates|bool %}
 rotateCertificates: true
+{% endif %}
+{% if kubelet_rotate_server_certificates|bool %}
+serverTLSBootstrap: true
 {% endif %}
 {# DNS settings for kubelet #}
 {% if enable_nodelocaldns %}
@@ -75,4 +81,13 @@ resolvConf: "{{ kube_resolv_conf }}"
 {% endif %}
 {% if inventory_hostname in groups['kube-node'] and kubelet_node_config_extra_args %}
 {{ kubelet_node_config_extra_args | to_nice_yaml(indent=2) }}
+{% endif %}
+{% if tls_min_version is defined %}
+tlsMinVersion: {{ tls_min_version }}
+{% endif %}
+{% if tls_cipher_suites is defined %}
+tlsCipherSuites:
+{% for tls in tls_cipher_suites %}
+- {{ tls }}
+{% endfor %}
 {% endif %}

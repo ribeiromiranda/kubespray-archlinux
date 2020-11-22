@@ -181,7 +181,7 @@ items:
                   port: 6784
               resources:
                 requests:
-                  cpu: 10m
+                  cpu: 50m
               securityContext:
                 privileged: true
               volumeMounts:
@@ -199,6 +199,7 @@ items:
                   mountPath: /lib/modules
                 - name: xtables-lock
                   mountPath: /run/xtables.lock
+                  readOnly: false
             - name: weave-npc
               env:
                 - name: HOSTNAME
@@ -210,12 +211,13 @@ items:
               imagePullPolicy: {{ k8s_image_pull_policy }}
               resources:
                 requests:
-                  cpu: 10m
+                  cpu: 50m
               securityContext:
                 privileged: true
               volumeMounts:
                 - name: xtables-lock
                   mountPath: /run/xtables.lock
+                  readOnly: false
           hostNetwork: true
           dnsPolicy: ClusterFirstWithHostNet
           hostPID: true
@@ -224,11 +226,7 @@ items:
             seLinuxOptions: {}
           serviceAccountName: weave-net
           tolerations:
-            - effect: NoSchedule
-              operator: Exists
-            # Mark pod as critical for rescheduling (Will have no effect starting with kubernetes 1.12)
-            - key: CriticalAddonsOnly
-              operator: "Exists"
+            - operator: Exists
           volumes:
             - name: weavedb
               hostPath:

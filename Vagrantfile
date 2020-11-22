@@ -9,32 +9,29 @@ Vagrant.require_version ">= 2.0.0"
 
 CONFIG = File.join(File.dirname(__FILE__), ENV['KUBESPRAY_VAGRANT_CONFIG'] || 'vagrant/config.rb')
 
-COREOS_URL_TEMPLATE = "https://storage.googleapis.com/%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
 FLATCAR_URL_TEMPLATE = "https://%s.release.flatcar-linux.net/amd64-usr/current/flatcar_production_vagrant.json"
 
 # Uniq disk UUID for libvirt
 DISK_UUID = Time.now.utc.to_i
 
 SUPPORTED_OS = {
-  "coreos-stable"       => {box: "coreos-stable",              user: "core", box_url: COREOS_URL_TEMPLATE % ["stable"]},
-  "coreos-alpha"        => {box: "coreos-alpha",               user: "core", box_url: COREOS_URL_TEMPLATE % ["alpha"]},
-  "coreos-beta"         => {box: "coreos-beta",                user: "core", box_url: COREOS_URL_TEMPLATE % ["beta"]},
   "flatcar-stable"      => {box: "flatcar-stable",             user: "core", box_url: FLATCAR_URL_TEMPLATE % ["stable"]},
   "flatcar-beta"        => {box: "flatcar-beta",               user: "core", box_url: FLATCAR_URL_TEMPLATE % ["beta"]},
   "flatcar-alpha"       => {box: "flatcar-alpha",              user: "core", box_url: FLATCAR_URL_TEMPLATE % ["alpha"]},
   "flatcar-edge"        => {box: "flatcar-edge",               user: "core", box_url: FLATCAR_URL_TEMPLATE % ["edge"]},
   "ubuntu1604"          => {box: "generic/ubuntu1604",         user: "vagrant"},
   "ubuntu1804"          => {box: "generic/ubuntu1804",         user: "vagrant"},
-  "ubuntu2004"          => {box: "geerlingguy/ubuntu2004",     user: "vagrant"},
+  "ubuntu2004"          => {box: "generic/ubuntu2004",         user: "vagrant"},
   "centos"              => {box: "centos/7",                   user: "vagrant"},
   "centos-bento"        => {box: "bento/centos-7.6",           user: "vagrant"},
   "centos8"             => {box: "centos/8",                   user: "vagrant"},
   "centos8-bento"       => {box: "bento/centos-8",             user: "vagrant"},
-  "fedora30"            => {box: "fedora/30-cloud-base",       user: "vagrant"},
   "fedora31"            => {box: "fedora/31-cloud-base",       user: "vagrant"},
+  "fedora32"            => {box: "fedora/32-cloud-base",       user: "vagrant"},
   "opensuse"            => {box: "bento/opensuse-leap-15.1",   user: "vagrant"},
   "opensuse-tumbleweed" => {box: "opensuse/Tumbleweed.x86_64", user: "vagrant"},
   "oraclelinux"         => {box: "generic/oracle7",            user: "vagrant"},
+  "oraclelinux8"        => {box: "generic/oracle8",            user: "vagrant"},
   "archlinux"           => {box: "archlinux/archlinux",        user: "vagrant"}
 }
 
@@ -47,7 +44,7 @@ $num_instances ||= 3
 $instance_name_prefix ||= "k8s"
 $vm_gui ||= false
 $vm_memory ||= 2048
-$vm_cpus ||= 1
+$vm_cpus ||= 2
 $shared_folders ||= {}
 $forwarded_ports ||= {}
 $subnet ||= "172.18.8"
@@ -55,6 +52,8 @@ $os ||= "ubuntu1804"
 $network_plugin ||= "flannel"
 # Setting multi_networking to true will install Multus: https://github.com/intel/multus-cni
 $multi_networking ||= false
+$download_run_once ||= "True"
+$download_force_cache ||= "True"
 # The first three nodes are etcd servers
 $etcd_instances ||= $num_instances
 # The first two nodes are kube masters
@@ -69,8 +68,9 @@ $override_disk_size ||= false
 $disk_size ||= "20GB"
 $local_path_provisioner_enabled ||= false
 $local_path_provisioner_claim_root ||= "/opt/local-path-provisioner/"
+$libvirt_nested ||= false
 
-$playbook = "cluster.yml"
+$playbook ||= "cluster.yml"
 
 host_vars = {}
 
@@ -146,6 +146,8 @@ Vagrant.configure("2") do |config|
       end
 
       node.vm.provider :libvirt do |lv|
+        lv.nested = $libvirt_nested
+        lv.cpu_mode = "host-model"
         lv.memory = $vm_memory
         lv.cpus = $vm_cpus
         lv.default_prefix = 'kubespray'
@@ -186,19 +188,24 @@ Vagrant.configure("2") do |config|
       # Disable swap for each vm
       node.vm.provision "shell", inline: "swapoff -a"
 
+      # Disable firewalld on oraclelinux vms
+      if ["oraclelinux","oraclelinux8"].include? $os
+        node.vm.provision "shell", inline: "systemctl stop firewalld; systemctl disable firewalld"
+      end
+
       host_vars[vm_name] = {
         "ip": ip,
         "flannel_interface": "eth1",
         "kube_network_plugin": $network_plugin,
         "kube_network_plugin_multus": $multi_networking,
-        "download_run_once": "True",
+        "download_run_once": $download_run_once,
         "download_localhost": "False",
         "download_cache_dir": ENV['HOME'] + "/kubespray_cache",
         # Make kubespray cache even when download_run_once is false
-        "download_force_cache": "True",
+        "download_force_cache": $download_force_cache,
         # Keeping the cache on the nodes can improve provisioning speed while debugging kubespray
         "download_keep_remote_cache": "False",
-        "docker_keepcache": "1",
+        "docker_rpm_keepcache": "1",
         # These two settings will put kubectl and admin.config in $inventory/artifacts
         "kubeconfig_localhost": "True",
         "kubectl_localhost": "True",

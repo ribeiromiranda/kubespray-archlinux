@@ -1,5 +1,4 @@
 ---
-
 - name: reset | include file with pre-reset tasks specific to the network_plugin if exists
   include_tasks: "{{ (role_path + '/../network_plugin/' + kube_network_plugin + '/tasks/pre-reset.yml') | realpath  }}"
   when:
@@ -42,13 +41,15 @@
   tags:
     - docker
 
-- name: reset | systemctl daemon-reload
+- name: reset | systemctl daemon-reload  # noqa 503
   systemd:
     daemon_reload: true
   when: services_removed.changed or docker_dropins_removed.changed
 
 - name: reset | remove all containers
-  shell: "{{ docker_bin_dir }}/docker ps -aq | xargs -r docker rm -fv"
+  shell: "set -o pipefail && {{ docker_bin_dir }}/docker ps -aq | xargs -r docker rm -fv"
+  args:
+    executable: /bin/bash
   register: remove_all_containers
   retries: 4
   until: remove_all_containers.rc == 0
@@ -57,7 +58,7 @@
   tags:
     - docker
 
-- name: reset | restart docker if needed
+- name: reset | restart docker if needed  # noqa 503
   service:
     name: docker
     state: restarted
@@ -66,7 +67,9 @@
     - docker
 
 - name: reset | stop all cri containers
-  shell: "crictl ps -aq | xargs -r crictl -t 60s stop"
+  shell: "set -o pipefail && crictl ps -aq | xargs -r crictl -t 60s stop"
+  args:
+    executable: /bin/bash
   register: remove_all_cri_containers
   retries: 5
   until: remove_all_cri_containers.rc == 0
@@ -77,7 +80,9 @@
   when: container_manager in ["crio", "containerd"]
 
 - name: reset | remove all cri containers
-  shell: "crictl ps -aq | xargs -r crictl -t 60s rm"
+  shell: "set -o pipefail && crictl ps -aq | xargs -r crictl -t 60s rm"
+  args:
+    executable: /bin/bash
   register: remove_all_cri_containers
   retries: 5
   until: remove_all_cri_containers.rc == 0
@@ -88,7 +93,9 @@
   when: container_manager in ["crio", "containerd"] and deploy_container_engine|default(true)
 
 - name: reset | stop all cri pods
-  shell: "crictl pods -q | xargs -r crictl -t 60s stopp"
+  shell: "set -o pipefail && crictl pods -q | xargs -r crictl -t 60s stopp"
+  args:
+    executable: /bin/bash
   register: remove_all_cri_containers
   retries: 5
   until: remove_all_cri_containers.rc == 0
@@ -99,7 +106,9 @@
   when: container_manager in ["crio", "containerd"]
 
 - name: reset | remove all cri pods
-  shell: "crictl pods -q | xargs -r crictl -t 60s rmp"
+  shell: "set -o pipefail && crictl pods -q | xargs -r crictl -t 60s rmp"
+  args:
+    executable: /bin/bash
   register: remove_all_cri_containers
   retries: 5
   until: remove_all_cri_containers.rc == 0
@@ -131,18 +140,19 @@
   tags:
     - services
 
-- name: reset | gather mounted kubelet dirs
-  shell: mount | grep /var/lib/kubelet/ | awk '{print $3}' | tac
+- name: reset | gather mounted kubelet dirs  # noqa 301
+  shell: set -o pipefail && mount | grep /var/lib/kubelet/ | awk '{print $3}' | tac
   args:
+    executable: /bin/bash
     warn: false
   check_mode: no
   register: mounted_dirs
   tags:
     - mounts
 
-- name: reset | unmount kubelet dirs
+- name: reset | unmount kubelet dirs  # noqa 301
   command: umount -f {{ item }}
-  with_items: '{{ mounted_dirs.stdout_lines }}'
+  with_items: "{{ mounted_dirs.stdout_lines }}"
   register: umount_dir
   retries: 4
   until: umount_dir.rc == 0
@@ -163,7 +173,7 @@
     - iptables
 
 - name: Clear IPVS virtual server table
-  shell: "ipvsadm -C"
+  command: "ipvsadm -C"
   when:
     - kube_proxy_mode == 'ipvs' and inventory_hostname in groups['k8s-cluster']
 
@@ -199,8 +209,8 @@
     - "{{ ansible_env.HOME | default('/root') }}/.kube"
     - "{{ ansible_env.HOME | default('/root') }}/.helm"
     - "{{ etcd_data_dir }}"
-    - /var/lib/etcd-events
-    - /etc/ssl/etcd
+    - "{{ etcd_events_data_dir }}"
+    - "{{ etcd_config_dir }}"
     - /var/log/calico
     - /etc/cni
     - "{{ nginx_config_dir }}"
@@ -296,14 +306,14 @@
       {%- else -%}
       network
       {%- endif -%}
-      {%- elif ansible_os_family == "Archlinux" or ansible_distribution == "Ubuntu" and ansible_distribution_release == "bionic" -%}
+      {%- elif ansible_os_family == "Archlinux" or ansible_distribution == "Ubuntu" and ansible_distribution_release in ["bionic", "focal"] -%}
       systemd-networkd
       {%- elif ansible_os_family == "Debian" -%}
       networking
       {%- endif %}
     state: restarted
   when:
-    - ansible_os_family not in ["CoreOS", "Coreos", "Container Linux by CoreOS", "Flatcar", "Flatcar Container Linux by Kinvolk"]
+    - ansible_os_family not in ["Flatcar Container Linux by Kinvolk"]
     - reset_restart_network
   tags:
     - services

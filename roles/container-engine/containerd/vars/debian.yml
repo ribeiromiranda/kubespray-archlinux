@@ -1,16 +1,4 @@
 ---
-
-containerd_versioned_pkg:
-  'latest': "{{ containerd_package }}"
-  '1.2.4': "{{ containerd_package }}=1.2.4-1"
-  '1.2.5': "{{ containerd_package }}=1.2.5-1"
-  '1.2.6': "{{ containerd_package }}=1.2.6-3"
-  '1.2.10': "{{ containerd_package }}=1.2.10-3"
-  '1.2.12': "{{ containerd_package }}=1.2.12-1"
-  '1.2.13': "{{ containerd_package }}=1.2.13-1"
-  'stable': "{{ containerd_package }}=1.2.13-1"
-  'edge': "{{ containerd_package }}=1.2.13-1"
-
 containerd_package_info:
   pkg_mgr: apt
   pkgs:
@@ -27,8 +15,8 @@ containerd_repo_info:
   pkg_repo: apt_repository
   repos:
     - >
-       deb {{ containerd_debian_repo_base_url }}
-       {{ ansible_distribution_release|lower }}
-       {{ containerd_debian_repo_component }}
+      deb {{ containerd_debian_repo_base_url }}
+      {{ ansible_distribution_release|lower }}
+      {{ containerd_debian_repo_component }}
 
 runc_binary: /usr/bin/runc

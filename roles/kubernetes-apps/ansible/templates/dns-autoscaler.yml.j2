@@ -30,8 +30,7 @@ spec:
       labels:
         k8s-app: dns-autoscaler{{ coredns_ordinal_suffix }}
       annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ""
-        seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+        seccomp.security.alpha.kubernetes.io/pod: 'runtime/default'
     spec:
       priorityClassName: system-cluster-critical
       securityContext:
@@ -43,8 +42,6 @@ spec:
         - effect: NoSchedule
           operator: Equal
           key: node-role.kubernetes.io/master
-        - key: "CriticalAddonsOnly"
-          operator: "Exists"
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -68,6 +65,11 @@ spec:
           requests:
             cpu: {{ dns_autoscaler_cpu_requests }}
             memory: {{ dns_autoscaler_memory_requests }}
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
         command:
         - /cluster-proportional-autoscaler
         - --namespace=kube-system

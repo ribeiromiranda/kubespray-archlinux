@@ -12,7 +12,7 @@ to create or modify an Ansible inventory. Currently, it is limited in
 functionality and is only used for configuring a basic Kubespray cluster inventory, but it does
 support creating inventory file for large clusters as well. It now supports
 separated ETCD and Kubernetes master roles from node role if the size exceeds a
-certain threshold. Run `python3 contrib/inventory_builder/inventory.py help` help for more information.
+certain threshold. Run `python3 contrib/inventory_builder/inventory.py help` for more information.
 
 Example inventory generator usage:
 
@@ -36,7 +36,7 @@ ansible-playbook -i inventory/mycluster/hosts.yml cluster.yml -b -v \
   --private-key=~/.ssh/private_key
 ```
 
-See more details in the [ansible guide](docs/ansible.md).
+See more details in the [ansible guide](/docs/ansible.md).
 
 ### Adding nodes
 
@@ -81,12 +81,12 @@ kube-apiserver via port 8080. A kubeconfig file is not necessary in this case,
 because kubectl will use <http://localhost:8080> to connect. The kubeconfig files
 generated will point to localhost (on kube-masters) and kube-node hosts will
 connect either to a localhost nginx proxy or to a loadbalancer if configured.
-More details on this process are in the [HA guide](docs/ha-mode.md).
+More details on this process are in the [HA guide](/docs/ha-mode.md).
 
 Kubespray permits connecting to the cluster remotely on any IP of any
 kube-master host on port 6443 by default. However, this requires
 authentication. One can get a kubeconfig from kube-master hosts
-(see [below](#accessing-kubernetes-api)) or connect with a [username and password](vars.md#user-accounts).
+(see [below](#accessing-kubernetes-api)) or connect with a [username and password](/docs/vars.md#user-accounts).
 
 For more information on kubeconfig and accessing a Kubernetes cluster, refer to
 the Kubernetes [documentation](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
@@ -96,10 +96,10 @@ the Kubernetes [documentation](https://kubernetes.io/docs/tasks/access-applicati
 Supported version is kubernetes-dashboard v2.0.x :
 
 - Login options are : token/kubeconfig by default, basic can be enabled with `kube_basic_auth: true` inventory variable - not recommended because this requires ABAC api-server which is not tested by kubespray team
-- Deployed by default in "kube-system" namespace, can be overriden with `dashboard_namespace: kubernetes-dashboard` in inventory,
+- Deployed by default in "kube-system" namespace, can be overridden with `dashboard_namespace: kubernetes-dashboard` in inventory,
 - Only serves over https
 
-Access is described in [dashboard docs](https://github.com/kubernetes/dashboard/blob/master/docs/user/accessing-dashboard/1.7.x-and-above.md). With kubespray's default deployment in kube-system namespace, instead of kuberntes-dashboard :
+Access is described in [dashboard docs](https://github.com/kubernetes/dashboard/tree/master/docs/user/accessing-dashboard). With kubespray's default deployment in kube-system namespace, instead of kuberntes-dashboard :
 
 - Proxy URL is <http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#/login>
 - kubectl commands must be run with "-n kube-system"
@@ -135,3 +135,8 @@ cd inventory/mycluster/artifacts
 ```
 
 If desired, copy admin.conf to ~/.kube/config.
+
+## Setting up your first cluster
+
+[Setting up your first cluster](/docs/setting-up-your-first-cluster.md) is an
+ applied step-by-step guide for setting up your first cluster with Kubespray.
