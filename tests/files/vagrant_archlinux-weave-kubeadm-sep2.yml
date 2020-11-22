@@ -5,11 +5,16 @@ vagrant_box: archlinux/archlinux
 vagrant_box_url: ""
 vagrant_user: vagrant
 
+
+startup_script: ""
+
 # Deployment settings
-kube_network_plugin: flannel
-flannel_interface: eth1
+kube_network_plugin: weave
 kubeadm_enabled: true
-skip_non_kubeadm_warning: true
 deploy_netchecker: true
+kubernetes_audit: true
 dns_min_replicas: 1
-loadbalancer_apiserver_type: haproxy
+
+kube_version: v1.17.9
+kubeadm_use_hyperkube_image: true
+kube_image_repo: "gcr.io/google_container"

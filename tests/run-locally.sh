@@ -4,6 +4,7 @@ PWD="$(pwd)/tests"
 
 export CI_JOB_NAME="vagrant_centos7-flannel-addons"
 #export CI_JOB_NAME="vagrant_coreos-canal"
+export CI_JOB_NAME=$1
 
 
 export CI_PIPELINE_ID="localy"

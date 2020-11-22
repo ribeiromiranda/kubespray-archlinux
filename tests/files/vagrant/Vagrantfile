@@ -21,7 +21,7 @@ $num_instances = 3
 $instance_name_prefix = "k8s-test"
 $vm_gui = false
 $vm_memory = 2048
-$vm_cpus = 1
+$vm_cpus = 2
 $subnet = "172.17.8"
 # The following only works when using the libvirt provider
 $override_disk_size = false
@@ -98,12 +98,11 @@ Vagrant.configure("2") do |config|
         end
       end
 
-      # Disable swap for each vm
-      node.vm.provision "shell", inline: "swapoff -a"
-
       ip = "#{$subnet}.#{i+100}"
       node.vm.network :private_network, ip: ip
 
+      # Disable swap for each vm
+      node.vm.provision "shell", inline: "swapoff -a"
     end
   end
 end
