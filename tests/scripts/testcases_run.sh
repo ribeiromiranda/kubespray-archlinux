@@ -39,7 +39,7 @@ if [[ "$CI_JOB_NAME" =~ "opensuse" ]]; then
 fi
 
 
-if [ "$CI_PLATFORM" == "vagrant" ]
+if [ "$CI_PLATFORM" == "locally" ]
 then
     LOCAL_RELEASE_DIR="/tmp/downloads"
 else
@@ -61,6 +61,7 @@ fi
 
 # Create cluster
 ansible-playbook ${ANSIBLE_LOG_LEVEL} -e @${CI_TEST_REGISTRY_MIRROR} -e @${CI_TEST_VARS} -e local_release_dir=$LOCAL_RELEASE_DIR -e ansible_python_interpreter=${PYPATH} --limit "all:!fake_hosts" cluster.yml
+exit;
 
 # Repeat deployment if testing upgrade
 if [ "${UPGRADE_TEST}" != "false" ]; then
