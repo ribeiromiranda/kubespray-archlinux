@@ -22,7 +22,7 @@ Some variables of note include:
 * *ipip* - Enables Calico ipip encapsulation by default
 * *kube_network_plugin* - Sets k8s network plugin (default Calico)
 * *kube_proxy_mode* - Changes k8s proxy mode to iptables mode
-* *kube_version* - Specify a given Kubernetes hyperkube version
+* *kube_version* - Specify a given Kubernetes version
 * *searchdomains* - Array of DNS domains to search when looking up hostnames
 * *nameservers* - Array of nameservers to use for DNS lookup
 * *preinstall_selinux_state* - Set selinux state, permitted values are permissive and disabled.
@@ -202,5 +202,4 @@ in the form of dicts of key-value pairs of configuration parameters that will be
 
 ## App variables
 
-* *helm_version* - Defaults to v3.x, set to a v2 version (e.g. `v2.16.1` ) to install Helm 2.x (will install Tiller!).
-Picking v3 for an existing cluster running Tiller will leave it alone. In that case you will have to remove Tiller manually afterwards.
+* *helm_version* - Only supports v3.x. Existing v2 installs (with Tiller) will not be modified and need to be removed manually.

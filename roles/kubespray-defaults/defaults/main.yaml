@@ -15,13 +15,10 @@ is_fedora_coreos: false
 disable_swap: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
-kube_version: v1.19.3
+kube_version: v1.19.7
 
 ## The minimum version working
-kube_version_min_required: v1.17.0
-
-# use HyperKube image to control plane containers
-kubeadm_use_hyperkube_image: False
+kube_version_min_required: v1.18.0
 
 ## Kube Proxy mode One of ['iptables','ipvs']
 kube_proxy_mode: ipvs
@@ -224,6 +221,10 @@ container_manager: docker
 # When enabled, it requires `container_manager` different than Docker
 kata_containers_enabled: false
 
+# Enable crun as additional container runtime
+# When enabled, it requires container_manager=crio
+crun_enabled: false
+
 # Container on localhost (download images when download_localhost is true)
 container_manager_on_localhost: "{{ container_manager }}"
 
@@ -298,8 +299,6 @@ containerd_use_systemd_cgroup: false
 # deployment type for legacy etcd mode
 etcd_deployment_type: docker
 cert_management: script
-
-helm_deployment_type: host
 
 # Make a copy of kubeconfig on the host that runs Ansible in {{ inventory_dir }}/artifacts
 kubeconfig_localhost: false
@@ -383,7 +382,7 @@ external_openstack_network_public_networks:
 authorization_modes: ['Node', 'RBAC']
 rbac_enabled: "{{ 'RBAC' in authorization_modes }}"
 
-# When enabled, API bearer tokens (including service account tokens) can be used to authenticate to the kubelet’s HTTPS endpoint
+# When enabled, API bearer tokens (including service account tokens) can be used to authenticate to the kubelet's HTTPS endpoint
 kubelet_authentication_token_webhook: true
 
 # When enabled, access to the kubelet API requires authorization by delegation to the API server
@@ -420,11 +419,6 @@ local_volume_provisioner_storage_classes: |
 # if null then no network encryption
 # you can use --extra-vars to pass the password in command line
 weave_password: EnterPasswordHere
-
-# Contiv L3 BGP Mode
-contiv_peer_with_uplink_leaf: false
-contiv_global_as: "65002"
-contiv_global_neighbor_as: "500"
 
 ssl_ca_dirs: |-
   [
@@ -486,12 +480,12 @@ etcd_events_peer_url: "https://{{ etcd_events_access_address }}:2382"
 etcd_events_client_url: "https://{{ etcd_events_access_address }}:2381"
 etcd_access_addresses: |-
   {% for item in etcd_hosts -%}
-    https://{{ hostvars[item]['access_ip'] | default(hostvars[item]['ip'] | default(fallback_ips[item])) }}:2379{% if not loop.last %},{% endif %}
+    https://{{ hostvars[item]['etcd_access_address'] | default(hostvars[item]['ip'] | default(fallback_ips[item])) }}:2379{% if not loop.last %},{% endif %}
   {%- endfor %}
 etcd_events_access_addresses_list: |-
   [
   {% for item in etcd_hosts -%}
-    'https://{{ hostvars[item]['access_ip'] | default(hostvars[item]['ip'] | default(fallback_ips[item])) }}:2381'{% if not loop.last %},{% endif %}
+    'https://{{ hostvars[item]['etcd_events_access_address'] | default(hostvars[item]['ip'] | default(fallback_ips[item])) }}:2381'{% if not loop.last %},{% endif %}
   {%- endfor %}
   ]
 etcd_events_access_addresses: "{{etcd_events_access_addresses_list | join(',')}}"
@@ -503,11 +497,11 @@ etcd_member_name: |-
   {% endfor %}
 etcd_peer_addresses: |-
   {% for item in groups['etcd'] -%}
-    {{ hostvars[item].etcd_member_name | default("etcd" + loop.index|string) }}=https://{{ hostvars[item].access_ip | default(hostvars[item].ip | default(fallback_ips[item])) }}:2380{% if not loop.last %},{% endif %}
+    {{ hostvars[item].etcd_member_name | default("etcd" + loop.index|string) }}=https://{{ hostvars[item].etcd_access_address | default(hostvars[item].ip | default(fallback_ips[item])) }}:2380{% if not loop.last %},{% endif %}
   {%- endfor %}
 etcd_events_peer_addresses: |-
   {% for item in groups['etcd'] -%}
-    {{ hostvars[item].etcd_member_name | default("etcd" + loop.index|string) }}-events=https://{{ hostvars[item].access_ip | default(hostvars[item].ip | default(fallback_ips[item])) }}:2382{% if not loop.last %},{% endif %}
+    {{ hostvars[item].etcd_member_name | default("etcd" + loop.index|string) }}-events=https://{{ hostvars[item].etcd_events_access_address | default(hostvars[item].ip | default(fallback_ips[item])) }}:2382{% if not loop.last %},{% endif %}
   {%- endfor %}
 
 podsecuritypolicy_enabled: false

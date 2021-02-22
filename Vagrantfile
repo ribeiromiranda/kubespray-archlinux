@@ -26,12 +26,14 @@ SUPPORTED_OS = {
   "centos-bento"        => {box: "bento/centos-7.6",           user: "vagrant"},
   "centos8"             => {box: "centos/8",                   user: "vagrant"},
   "centos8-bento"       => {box: "bento/centos-8",             user: "vagrant"},
-  "fedora31"            => {box: "fedora/31-cloud-base",       user: "vagrant"},
   "fedora32"            => {box: "fedora/32-cloud-base",       user: "vagrant"},
+  "fedora33"            => {box: "fedora/33-cloud-base",       user: "vagrant"},
   "opensuse"            => {box: "bento/opensuse-leap-15.1",   user: "vagrant"},
   "opensuse-tumbleweed" => {box: "opensuse/Tumbleweed.x86_64", user: "vagrant"},
   "oraclelinux"         => {box: "generic/oracle7",            user: "vagrant"},
   "oraclelinux8"        => {box: "generic/oracle8",            user: "vagrant"},
+  "rhel7"               => {box: "generic/rhel7",              user: "vagrant"},
+  "rhel8"               => {box: "generic/rhel8",              user: "vagrant"},
   "archlinux"           => {box: "archlinux/archlinux",        user: "vagrant"}
 }
 
@@ -90,10 +92,10 @@ if ! File.exist?(File.join(File.dirname($inventory), "hosts.ini"))
 end
 
 if Vagrant.has_plugin?("vagrant-proxyconf")
-    $no_proxy = ENV['NO_PROXY'] || ENV['no_proxy'] || "127.0.0.1,localhost"
-    (1..$num_instances).each do |i|
-        $no_proxy += ",#{$subnet}.#{i+100}"
-    end
+  $no_proxy = ENV['NO_PROXY'] || ENV['no_proxy'] || "127.0.0.1,localhost"
+  (1..$num_instances).each do |i|
+      $no_proxy += ",#{$subnet}.#{i+100}"
+  end
 end
 
 Vagrant.configure("2") do |config|
@@ -178,9 +180,18 @@ Vagrant.configure("2") do |config|
         node.vm.network "forwarded_port", guest: guest, host: host, auto_correct: true
       end
 
-      node.vm.synced_folder ".", "/vagrant", disabled: false, type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z'] , rsync__exclude: ['.git','venv']
-      $shared_folders.each do |src, dst|
-        node.vm.synced_folder src, dst, type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
+      if ["rhel7","rhel8"].include? $os
+        # Vagrant synced_folder rsync options cannot be used for RHEL boxes as Rsync package cannot
+        # be installed until the host is registered with a valid Red Hat support subscription
+        node.vm.synced_folder ".", "/vagrant", disabled: false
+        $shared_folders.each do |src, dst|
+          node.vm.synced_folder src, dst
+        end
+      else
+        node.vm.synced_folder ".", "/vagrant", disabled: false, type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z'] , rsync__exclude: ['.git','venv']
+        $shared_folders.each do |src, dst|
+          node.vm.synced_folder src, dst, type: "rsync", rsync__args: ['--verbose', '--archive', '--delete', '-z']
+        end
       end
 
       ip = "#{$subnet}.#{i+100}"
@@ -189,8 +200,8 @@ Vagrant.configure("2") do |config|
       # Disable swap for each vm
       node.vm.provision "shell", inline: "swapoff -a"
 
-      # Disable firewalld on oraclelinux vms
-      if ["oraclelinux","oraclelinux8"].include? $os
+      # Disable firewalld on oraclelinux/redhat vms
+      if ["oraclelinux","oraclelinux8","rhel7","rhel8"].include? $os
         node.vm.provision "shell", inline: "systemctl stop firewalld; systemctl disable firewalld"
       end
 

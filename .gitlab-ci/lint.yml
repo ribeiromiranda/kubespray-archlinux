@@ -64,9 +64,9 @@ markdownlint:
   tags: [light]
   image: node
   before_script:
-    - npm install -g markdownlint-cli
+    - npm install -g markdownlint-cli@0.22.0
   script:
-    - markdownlint README.md docs --ignore docs/_sidebar.md
+    - markdownlint $(find . -name '*.md' | grep -vF './.git') --ignore docs/_sidebar.md --ignore contrib/dind/README.md
 
 ci-matrix:
   stage: unit-tests
