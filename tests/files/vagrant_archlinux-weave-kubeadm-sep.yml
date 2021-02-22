@@ -14,4 +14,4 @@ kubeadm_enabled: true
 deploy_netchecker: true
 kubernetes_audit: true
 dns_min_replicas: 1
-
+dashboard_enabled: false

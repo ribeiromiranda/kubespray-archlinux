@@ -20,7 +20,7 @@ export ANSIBLE_REMOTE_USER=$SSH_USER
 export ANSIBLE_BECOME=true
 export ANSIBLE_BECOME_USER=root
 
-cd tests && make create-${CI_PLATFORM} -s ; cd ..
+#cd tests && make create-${CI_PLATFORM} -s ; cd ..
 ansible-playbook tests/cloud_playbooks/wait-for-ssh.yml
 
 # CoreOS needs auto update disabled
@@ -61,6 +61,8 @@ fi
 
 # Create cluster
 ansible-playbook ${ANSIBLE_LOG_LEVEL} -e @${CI_TEST_REGISTRY_MIRROR} -e @${CI_TEST_VARS} -e local_release_dir=$LOCAL_RELEASE_DIR -e ansible_python_interpreter=${PYPATH} --limit "all:!fake_hosts" cluster.yml
+exit;
+
 
 # Repeat deployment if testing upgrade
 if [ "${UPGRADE_TEST}" != "false" ]; then

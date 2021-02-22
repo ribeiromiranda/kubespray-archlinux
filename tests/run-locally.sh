@@ -24,7 +24,7 @@ export MAGIC="ci check this"
 export TEST_ID="$CI_PIPELINE_ID-$CI_BUILD_ID"
 export CI_TEST_VARS="./tests/files/${CI_JOB_NAME}.yml"
 #export CONTAINER_ENGINE: docker
-export SSH_USER="root"
+export SSH_USER="vagrant"
 export ANSIBLE_KEEP_REMOTE_FILES="1"
 export ANSIBLE_CONFIG="./tests/ansible.cfg"
 export ANSIBLE_INVENTORY="${PWD}/../inventory/sample/${CI_JOB_NAME}-${BUILD_NUMBER}.ini"
@@ -33,11 +33,16 @@ export RESET_CHECK="false"
 export UPGRADE_TEST="false"
 export LOG_LEVEL="-vv"
 
+export RECOVER_CONTROL_PLANE_TEST="true"
+
+export MITOGEN_ENABLE=false
+export ANSIBLE_LOG_LEVEL="-vvvvvv"
+
 export PYPATH="/usr/bin/python"
 
 #source ./tests/scripts/rebase.sh
 #source ./tests/scripts/testcases_prepare.sh
 source ./tests/scripts/testcases_run.sh
-source ./tests/scripts/testcases_cleanup.sh
+#source ./tests/scripts/testcases_cleanup.sh
 
 
