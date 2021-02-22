@@ -17,19 +17,8 @@ docker_cli_versioned_pkg:
   '20.10': docker-ce-cli-20.10.2-3.el{{ ansible_distribution_major_version }}
 
 docker_package_info:
-  pkg_mgr: yum
+  enablerepo: "docker-ce"
   pkgs:
-    - name: "{{ containerd_versioned_pkg[containerd_version | string] }}"
-      repo: "docker-ce"
-    - name: "{{ docker_cli_versioned_pkg[docker_cli_version | string] }}"
-      repo: "docker-ce"
-    - name: "{{ docker_versioned_pkg[docker_version | string] }}"
-      repo: "docker-ce"
-
-docker_repo_key_info:
-  pkg_key: ''
-  repo_keys: []
-
-docker_repo_info:
-  pkg_repo: ''
-  repos: []
+    - "{{ containerd_versioned_pkg[containerd_version | string] }}"
+    - "{{ docker_cli_versioned_pkg[docker_cli_version | string] }}"
+    - "{{ docker_versioned_pkg[docker_version | string] }}"
