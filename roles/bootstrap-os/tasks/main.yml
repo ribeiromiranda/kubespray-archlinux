@@ -74,23 +74,23 @@
     - override_system_hostname
     - ansible_os_family in ['Archlinux', 'Suse', 'Flatcar Container Linux by Kinvolk', 'Container Linux by CoreOS', 'ClearLinux'] or is_fedora_coreos
 
-- name: "Install ceph-commmon package"
+- name: "Install ceph-libs package"
   package:
     name:
-      - ceph-common
+      - ceph-libs
     state: present
   when:
     - rbd_provisioner_enabled|default(false)
-    - '"Arch Linux" not in os_release.stdout'
+    - ansible_os_family in ['Archlinux'],
 
-- name: "Install ceph-commmon package"
+- name: "Install ceph package"
   package:
     name:
       - ceph
     state: present
   when:
     - rbd_provisioner_enabled|default(false)
-    - '"Arch Linux" in os_release.stdout'
+    - ansible_os_family in ['Archlinux'],
 
 - name: Ensure bash_completion.d folder exists
   file:
