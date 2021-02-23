@@ -1,6 +1,12 @@
 ---
 #  raw: cat /etc/issue.net | grep '{{ bootstrap_versions }}'
 
+- name: Bootstrap | Install essential packages 
+  raw:
+    rm -f /var/lib/pacman/db.lck && \
+    pacman -Sy && \
+    pacman -S --noconfirm --noprogressbar which
+
 - name: Bootstrap | Check if bootstrap is needed
   raw: which "{{ item }}"
   register: need_bootstrap
@@ -10,6 +16,7 @@
     - ethtool
     - python-netaddr
     - sshpass
+    - conntrack-tools
   environment: {}
   tags:
     - facts
@@ -18,7 +25,7 @@
   raw:
     rm -f /var/lib/pacman/db.lck && \
     pacman -Sy && \
-    pacman -S --noconfirm --noprogressbar ethtool python-netaddr sshpass
+    pacman -S --noconfirm --noprogressbar ethtool python-netaddr sshpass conntrack-tools
   when:
     need_bootstrap.results | map(attribute='rc') | sort | last | bool
 

@@ -7,6 +7,7 @@ containerd_package_info:
   pkgs:
     - name: "{{ containerd_package }}"
       state: latest
+      force: false
 
 containerd_repo_key_info:
   pkg_key: ''
