@@ -26,6 +26,7 @@ yum_repo_dir: /etc/yum.repos.d
 
 # Optional values for containerd apt repo
 containerd_package_info:
+  pkg_mgr:
   pkgs:
 
 containerd_repo_key_info:
