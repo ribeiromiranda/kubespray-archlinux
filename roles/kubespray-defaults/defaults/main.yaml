@@ -1,7 +1,7 @@
 ---
 # Use proxycommand if bastion host is in group all
 # This change obseletes editing ansible.cfg file depending on bastion existence
-ansible_ssh_common_args: "{% if 'bastion' in groups['all'] %} -o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -W %h:%p {{ hostvars['bastion']['ansible_user'] }}@{{ hostvars['bastion']['ansible_host'] }} {% if ansible_ssh_private_key_file is defined %}-i {{ ansible_ssh_private_key_file }}{% endif %} ' {% endif %}"
+ansible_ssh_common_args: "{% if 'bastion' in groups['all'] %} -o ProxyCommand='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -W %h:%p -p {{ hostvars['bastion']['ansible_port'] | default(22) }} {{ hostvars['bastion']['ansible_user'] }}@{{ hostvars['bastion']['ansible_host'] }} {% if ansible_ssh_private_key_file is defined %}-i {{ ansible_ssh_private_key_file }}{% endif %} ' {% endif %}"
 
 # selinux state
 preinstall_selinux_state: permissive
@@ -15,7 +15,7 @@ is_fedora_coreos: false
 disable_swap: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
-kube_version: v1.19.7
+kube_version: v1.19.9
 
 ## The minimum version working
 kube_version_min_required: v1.18.0
@@ -442,6 +442,8 @@ apiserver_loadbalancer_domain_name: "lb-apiserver.kubernetes.local"
 kube_apiserver_global_endpoint: |-
   {% if loadbalancer_apiserver is defined -%}
       https://{{ apiserver_loadbalancer_domain_name }}:{{ loadbalancer_apiserver.port|default(kube_apiserver_port) }}
+  {%- elif use_localhost_as_kubeapi_loadbalancer|default(False)|bool -%}
+      https://127.0.0.1:{{ kube_apiserver_port }}
   {%- else -%}
       https://{{ first_kube_master }}:{{ kube_apiserver_port }}
   {%- endif %}
