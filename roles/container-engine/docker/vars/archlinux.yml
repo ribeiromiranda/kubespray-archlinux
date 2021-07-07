@@ -4,7 +4,7 @@ docker_kernel_min_version: '0'
 docker_package_info:
   pkg_mgr: pacman
   pkgs:
-    - name: docker
+    - docker
 
 docker_repo_key_info:
   pkg_key: ''

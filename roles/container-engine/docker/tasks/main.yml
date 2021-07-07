@@ -112,6 +112,8 @@
       enablerepo: "{{ docker_package_info.enablerepo | default(omit) }}"
     zypper:
       update_cache: true
+    pacman:
+      update_cache: true
   register: docker_task_result
   until: docker_task_result is succeeded
   retries: 4
