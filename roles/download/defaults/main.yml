@@ -835,23 +835,6 @@ downloads:
     groups:
     - kube_control_plane
 
-  calico_crds:
-    file: true
-    enabled: "{{ kube_network_plugin == 'calico' and calico_datastore == 'kdd' }}"
-    version: "{{ calico_version }}"
-    dest: "{{ local_release_dir }}/calico-{{ calico_version }}-kdd-crds/{{ calico_version }}.tar.gz"
-    sha256: "{{ calico_crds_archive_checksum }}"
-    url: "{{ calico_crds_download_url }}"
-    unarchive: true
-    unarchive_extra_opts:
-    - "--strip=6"
-    - "--wildcards"
-    - "*/_includes/charts/calico/crds/kdd/"
-    owner: "root"
-    mode: "0755"
-    groups:
-    - kube-master
-
   weave_kube:
     enabled: "{{ kube_network_plugin == 'weave' }}"
     container: true
