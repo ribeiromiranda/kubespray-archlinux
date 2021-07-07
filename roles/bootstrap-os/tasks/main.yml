@@ -87,10 +87,11 @@
     - rbd_provisioner_enabled|default(false)
     - '"Arch Linux" not in os_release.stdout'
 
-- name: "Install ceph-commmon package"
+- name: "Install ceph package"
   package:
     name:
       - ceph
+      - ceph-libs
     state: present
   when:
     - rbd_provisioner_enabled|default(false)

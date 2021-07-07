@@ -15,6 +15,7 @@ FLATCAR_URL_TEMPLATE = "https://%s.release.flatcar-linux.net/amd64-usr/current/f
 DISK_UUID = Time.now.utc.to_i
 
 SUPPORTED_OS = {
+  "archlinux"           => {box: "archlinux/archlinux",        user: "vagrant"},
   "flatcar-stable"      => {box: "flatcar-stable",             user: "core", box_url: FLATCAR_URL_TEMPLATE % ["stable"]},
   "flatcar-beta"        => {box: "flatcar-beta",               user: "core", box_url: FLATCAR_URL_TEMPLATE % ["beta"]},
   "flatcar-alpha"       => {box: "flatcar-alpha",              user: "core", box_url: FLATCAR_URL_TEMPLATE % ["alpha"]},
@@ -33,8 +34,7 @@ SUPPORTED_OS = {
   "oraclelinux"         => {box: "generic/oracle7",            user: "vagrant"},
   "oraclelinux8"        => {box: "generic/oracle8",            user: "vagrant"},
   "rhel7"               => {box: "generic/rhel7",              user: "vagrant"},
-  "rhel8"               => {box: "generic/rhel8",              user: "vagrant"},
-  "archlinux"           => {box: "archlinux/archlinux",        user: "vagrant"}
+  "rhel8"               => {box: "generic/rhel8",              user: "vagrant"}
 }
 
 if File.exist?(CONFIG)
