@@ -10,7 +10,7 @@ In case your servers don't have access to internet (for example when deploying o
 
 ## Configure Inventory
 
-Once all artifacts are accessible from your internal network, **adjust** the following variables in [your inventory](/inventory/sample/group_vars/k8s-cluster/offline.yml) to match your environment:
+Once all artifacts are accessible from your internal network, **adjust** the following variables in [your inventory](/inventory/sample/group_vars/all/offline.yml) to match your environment:
 
 ```yaml
 # Registry overrides
@@ -31,7 +31,7 @@ calicoctl_download_url: "{{ files_repo }}/kubernetes/calico/{{ calico_ctl_versio
 # If using Calico with kdd
 calico_crds_download_url: "{{ files_repo }}/kubernetes/calico/{{ calico_version }}.tar.gz"
 
-# CentOS/Redhat
+# CentOS/Redhat/AlmaLinux
 ## Docker / Containerd
 docker_rh_repo_base_url: "{{ yum_repo }}/docker-ce/$releasever/$basearch"
 docker_rh_repo_gpgkey: "{{ yum_repo }}/docker-ce/gpg"
@@ -110,5 +110,3 @@ If you use [Kubespray Container Image](#recommended-way:-kubespray-container-ima
 ```bash
 docker run --rm -it -v path_to_inventory/my_airgap_cluster:inventory/my_airgap_cluster myprivateregisry.com/kubespray/kubespray:v2.14.0 ansible-playbook -i inventory/my_airgap_cluster/hosts.yaml -b cluster.yml
 ```
-
-## Please Note: Offline installation doesn't support CRI-O container runtime at the moment (see [this issue](https://github.com/kubernetes-sigs/kubespray/issues/6233))

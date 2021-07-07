@@ -10,7 +10,7 @@
   when: '"Arch Linux" in os_release.stdout'
 
 - include_tasks: bootstrap-centos.yml
-  when: '''ID="centos"'' in os_release.stdout_lines or ''ID="ol"'' in os_release.stdout_lines'
+  when: '''ID="centos"'' in os_release.stdout_lines or ''ID="ol"'' in os_release.stdout_lines or ''ID="almalinux"'' in os_release.stdout_lines'
 
 - include_tasks: bootstrap-redhat.yml
   when: '''ID="rhel"'' in os_release.stdout_lines'

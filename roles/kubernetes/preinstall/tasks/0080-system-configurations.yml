@@ -68,6 +68,15 @@
     state: present
     reload: yes
 
+- name: Enable ipv6 forwarding
+  sysctl:
+    sysctl_file: "{{ sysctl_file_path }}"
+    name: net.ipv6.conf.all.forwarding
+    value: 1
+    state: present
+    reload: yes
+  when: enable_dual_stack_networks | bool
+
 - name: Ensure kube-bench parameters are set
   sysctl:
     sysctl_file: /etc/sysctl.d/bridge-nf-call.conf
@@ -98,4 +107,3 @@
   when:
     - ansible_os_family in ["Archlinux"]
     - kube_network_plugin == "calico"
-

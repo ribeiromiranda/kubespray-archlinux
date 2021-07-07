@@ -13,7 +13,8 @@ common_required_pkgs:
   - unzip
   - e2fsprogs
   - xfsprogs
-  # - ebtables
+  - ebtables
+  - bash-completion
 
 # Set to true if your network does not support IPv6
 # This maybe necessary for pulling Docker images from
